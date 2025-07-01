@@ -1,0 +1,67 @@
+use librarydb;
+
+-- 1 INNER JOIN: Show all books with their author names
+
+SELECT B.TITLE, A.AUTHORNAME  FROM AUTHORS AS A
+INNER JOIN BOOKS AS B ON A.AUTHORID = B.AUTHORID;
+ 
+-- 2 LEFT JOIN: Show all members and the books they have borrowed (if any)
+
+SELECT M.FULLNAME AS MEMBERNAME , B.TITLE FROM MEMBERS AS M 
+LEFT JOIN LOANS AS L ON M.MEMBERID = L.MEMBERID
+LEFT JOIN BOOKS AS B ON L.BOOKID = B.BOOKID;
+
+-- 3 RIGHT JOIN: Show all loaned books and member names (even if member record is missing)
+
+SELECT L.LOANID AS LOAN_BOOK, M.FULLNAME AS NAME  FROM MEMBERS AS M
+RIGHT JOIN LOANS AS L ON M.MEMBERID = L.MEMBERID;
+
+-- 4 FULL OUTER JOIN: Show all members and all loan records, matched where possible
+
+SELECT M.FULLNAME AS MEMBERNAME , L.LOANID FROM MEMBERS AS M 
+LEFT JOIN LOANS AS L ON M.MEMBERID = L.MEMBERID
+
+UNION 
+
+SELECT M.FULLNAME AS MEMBERNAME , L.LOANID FROM MEMBERS AS M 
+RIGHT JOIN LOANS AS L ON M.MEMBERID = L.MEMBERID;
+
+-- 5 JOIN with WHERE: List loans placed in 2024 with book title and member name
+
+SELECT B.TITLE AS NAME, L.LOANDATE AS YEAR FROM BOOKS AS B
+JOIN LOANS AS L ON L.BOOKID = B.BOOKID
+WHERE YEAR(L.LOANDATE) = 2024;
+
+-- 6 MULTI JOIN: Show member name, book title, and category name for each loan
+
+SELECT DISTINCT M.FULLNAME AS NAME, B.TITLE, C.CATEGORYNAME FROM LOANS AS L
+INNER JOIN MEMBERS AS M ON L.MEMBERID = M.MEMBERID
+INNER JOIN BOOKS AS B ON L.BOOKID = B.BOOKID
+INNER JOIN CATEGORIES AS C ON B.CATEGORYID = C.CATEGORYID;
+ 
+-- 7 ALIAS + FILTER: Show members who borrowed the book titled 'Harry Potter'
+
+SELECT M.FULLNAME AS FILTER FROM MEMBERS AS M
+JOIN LOANS AS L ON L.MEMBERID = M.MEMBERID
+JOIN BOOKS AS B ON L.BOOKID = B.BOOKID
+WHERE B.TITLE = 'HARRY POTTER';
+
+-- 8 AGGREGATE JOIN: Count how many books each member has borrowed
+
+SELECT M.FULLNAME AS NAME, COUNT(L.MEMBERID) AS BOOK_COUNT FROM MEMBERS AS M
+JOIN LOANS AS L ON L.MEMBERID = M.MEMBERID
+GROUP BY M.FULLNAME;
+
+-- 9 CROSS JOIN: Show all combinations of members and available books
+
+SELECT M.FullName AS MemberName, B.Title AS BookTitle
+FROM Members AS M
+CROSS JOIN Books AS B;
+
+-- 10 SELF JOIN: List staff members along with their reporting manager names
+
+SELECT S1.StaffName AS Staff, S2.StaffName AS Manager
+FROM Staff AS S1
+JOIN Staff AS S2 ON S1.ReportsTo = S2.StaffID;
+
+SELECT * FROM STAFF;
